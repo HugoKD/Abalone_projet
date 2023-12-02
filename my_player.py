@@ -51,7 +51,9 @@ class MyPlayer(PlayerAbalone):
         print('player',type(list(list(current_state.get_possible_actions())[0].get_next_game_state().generate_possible_actions())[0].get_next_game_state().get_scores()[my_player_id]))
         print(current_state.get_scores()[my_player_id])
         max_action = self.heuristic(current_state,my_player_id,place)
-        print('######',max_action)
+        print('######', max_action)
+        print(current_state.is_done())
+
         #print('action',my_actions)
         # [print(*x) for x in current_state.get_rep().get_grid()]
         # [print(a, b.__dict__) for a, b in current_state.get_rep().env.items()]
@@ -60,15 +62,16 @@ class MyPlayer(PlayerAbalone):
         if kwargs:
             pass
         #print(list(possible_actions))
-        return max_action
+        print(type(random.choice(list(possible_actions))))
+        return random.choice(list(possible_actions))
 
 
     def heuristic(self, current_state : GameState, my_player_id : int, place : int): #vision a deux pas dans le future, why not rajouter un para
         #but premier maximiser le score à deux pas
+        arbre_heuristic = ArbreHeuristic(current_state)
         A1 = list(current_state.get_possible_actions())
-        score2 = {} #min score  -6, nbr pice = 14
-        score1 = {}
-        #on initialise le score par chaque premier choix et le choix menant a ce score
+        score_niv_2 = {} # Enregistrer les scores des noeuds au niv 2
+        score_niv_1 = {} #  Enregistrer les scores des noeuds au niv 1
         a1_idx = -1
         for a1 in A1 : #pour chaque état parent
             a1_idx += 1
@@ -79,37 +82,57 @@ class MyPlayer(PlayerAbalone):
             for a2 in A2 :
                 a2_idx += 1
                 score = a2.get_next_game_state().get_scores()[my_player_id]
-                score2_1[str(i)]= score
-            score2[]
-                i+=1
+                score2_1[str(i)]= (score,a2) #on store le score et l'action pour y parvenir
+                i += 1
+            score_niv_2[str(a1_idx)] = score2_1
+        #on calcule maintenant score niv 1 en faisant un moyenne des scores de ces enfants pour ensuite choisir la meilleur action
+        for key in score_niv_2.keys():
+            score_niv_1[str(key)] = sum([x[0] for x in score_niv_2[key].values()])/(len(score_niv_2[key]))
+        return score_niv_2# pas très pratique deux dictio
             # Calculer la distance au centre, avec une moyenne, de nos billes
-        return A1[a1_idx]
-    # def minimax(state, depth, maximizing_player):
-    #     if depth == 0 or game_over(state):
-    #         return evaluate(state)
-    #
-    #     if maximizing_player:
-    #         max_eval = float('-inf')
-    #         for child_state in get_possible_moves(state):
-    #             eval = minimax(child_state, depth - 1, False)
-    #             max_eval = max(max_eval, eval)
-    #         return max_eval
-    #     else:
-    #         min_eval = float('inf')
-    #         for child_state in get_possible_moves(state):
-    #             eval = minimax(child_state, depth - 1, True)
-    #             min_eval = min(min_eval, eval)
-    #         return min_eval
-    #
-    # def get_best_move(state):
-    #     best_move = None
-    #     max_eval = float('-inf')
-    #
-    #     for child_state in get_possible_moves(state):
-    #         eval = minimax(child_state, depth=2, maximizing_player=False)
-    #         if eval > max_eval:
-    #             max_eval = eval
-    #             best_move = child_state
-    #
-    #     return best_move
 
+
+
+class NoeudNonBinaire:
+    def __init__(self, etat : GameState , action : Action, score : int ): # action : Action pour faire parent -> enfant
+        self.etat = etat
+        self.action = action
+        self.enfants = [] # est ce que enfant = liste ?
+
+    def ajouter_enfant(self, etat,action):
+        nouvel_enfant = NoeudNonBinaire(etat,action)
+        self.enfants.append(nouvel_enfant)
+
+    def get_enfants(self):
+        return self.enfants
+
+class ArbreHeuristic:
+    def __init__(self, etat : GameState):
+        self.racine = NoeudNonBinaire(etat,action=None, score=0) # On commence avec toutes nos pièces
+
+    def ajouter_enfant(self, parent, etat, action):
+        # Recherche du parent dans l'arbre
+        file = [self.racine]
+        while file:
+            noeud_courant = file.pop(0)
+            if noeud_courant.etat == parent:
+                # Ajout du nouvel enfant au parent trouvé
+                noeud_courant.ajouter_enfant(etat)
+                return
+            else:
+                file.extend(noeud_courant.get_enfants())
+
+    def parcours_largeur(self):
+        file = [self.racine]
+        while file:
+            noeud_courant = file.pop(0)
+            print(noeud_courant.etat)
+            file.extend(noeud_courant.get_enfants())
+
+    def parcours_profondeur(self):  # A tester
+        file = [self.racine]
+        print(file)
+        while file:
+            noeud_courant = file.pop()
+            print(noeud_courant.etat)
+            file.extend(noeud_courant.get_enfants())
