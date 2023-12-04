@@ -67,7 +67,7 @@ class MyPlayer(PlayerAbalone):
     def heuristic(self, current_state : GameState, my_player_id : int):
         #création d une table de hashage hash : state et d un arbre heuristique associant hash : score
         #but premier maximiser le score à deux pas
-        # but deuxième minimiser la moyenne des distances au centre du plateau des billes
+        # TODO : but deuxième minimiser la moyenne des distances au centre du plateau des billes
         hash_table = {}
         heuristicTree = HeuristicTree()
         A1 = list(current_state.get_possible_actions())
