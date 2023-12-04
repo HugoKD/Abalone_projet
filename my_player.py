@@ -3,6 +3,7 @@ from seahorse.game.action import Action
 from seahorse.game.game_state import GameState
 from seahorse.utils.custom_exceptions import MethodNotImplementedError
 import random
+from time import sleep
 #algorithme de type minimax
 # on explore que 2 niveaux. Current_state -> Action_adverser -> Prochain_state
 # on suppose que forcement, a partir d un état on a au moins deux actions possibles
@@ -38,12 +39,9 @@ class MyPlayer(PlayerAbalone):
             Action: selected feasible action
         """
         # en moyenne on a ~ 50 actions possibles par état
+
         # [print(*x) for x in current_state.get_rep().get_grid()]
         # [print(a, b.__dict__) for a, b in current_state.get_rep().env.items()]
-
-        if kwargs:
-            pass
-        # attribution du joueur se fait par rapport a l'odre de la ligne de commande
 
         players = [player for player in current_state.players]
         my_player_id = None
@@ -55,17 +53,13 @@ class MyPlayer(PlayerAbalone):
             place += 1
 
         heuristic_tree, hash_table = self.heuristic(current_state= current_state,my_player_id= my_player_id)
-        arbre_scorer = heuristic_tree.get_tree() # on obtient un arbre de la forme HeuristicTree avec le score de chaque état décidé par notre heuristic
+
         # on appelle minimax
 
-        #v,m = heuristic_tree.minimax(game_state_parent= current_state, game_state = current_state, maximizingPlayer= True,heuristic_tree= heuristic_tree,hash_table= hash_table)
-        path = heuristic_tree.minimax()
-
-        possible_actions = current_state.get_possible_actions()
-        random.seed("seahorse")
-        if kwargs:
-            pass
-        return random.choice(list(possible_actions))
+        v,m_hash = heuristic_tree.minimax()
+        next_state = hash_table[m_hash]
+        best_action = Action(current_state, next_state)
+        return best_action
 
 
 
@@ -89,6 +83,8 @@ class MyPlayer(PlayerAbalone):
                 heuristicTree[a1_hash][a2_hash] = score # on store le score et le chemin pour y arriver
                 hash_table[a2_hash] = etat2
         return heuristicTree, hash_table
+
+
 
 
 
@@ -126,20 +122,6 @@ class HeuristicTree(dict): # tout transformer en hash
             return list(x.keys())
         #return list hash or valeur node = function evaluate
 
-    def find_path_to_state(self, state, path=None):  # trouver path_to_action -> list[hash]
-        if path is None:
-            path = []
-        for key, value in self.items():
-            current_path = path + [key]
-
-            if key == state:
-                return current_path
-            elif isinstance(value, dict):
-                result = value.find_path_to_state(state, current_path)
-                if result:
-                    return result
-        return None
-
     def find_path_to_hash(self, hash : int , path=None):  # trouver path_to_action -> list[hash]
         if path is None:
             path = []
@@ -162,27 +144,33 @@ class HeuristicTree(dict): # tout transformer en hash
             path_to_hash = [] # ie on est la racine
         else :
             path_to_hash = self.find_path_to_hash(game_state_hash)
+
         children = self.get_children(path_to_hash)
-        print(path_to_hash,depth)
-        if depth == 0:
-            return 0
+
+        if depth == 0: # ie get children = int
+            score = self.get_children(path_to_node= path_to_hash)
+            return score, path_to_hash
 
         if maximizingPlayer :
             value = float('-inf')
-
-            for child in children :
-                tmp= self.minimax(game_state_hash= child,maximizingPlayer= False, depth= depth - 1)
+            for child in children : # child is hash
+                tmp= self.minimax(game_state_hash= child,maximizingPlayer= False, depth= depth - 1)[0]
+                if type(tmp) == list:
+                    tmp = tmp[0]
+                if tmp > value:
+                    value = tmp
+                    best_movement = child
         else :
-            value = float('-inf')
-            for child in children:
-                tmp = self.minimax(game_state_hash=child, maximizingPlayer= True, depth=depth - 1)
-        return path_to_hash
+            value = float('inf')
+            for child in children: # child is hash
+                tmp= self.minimax(game_state_hash=child, maximizingPlayer= True, depth=depth - 1)[0]
+                if type(tmp) == list :
+                    tmp = tmp[0]
+                if tmp < value:
+                    value = tmp
+                    best_movement = child
 
-
-
-
-# jusqu'a la sur à 100%
-
+        return value, best_movement
 
 
 
