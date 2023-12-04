@@ -40,6 +40,7 @@ class MyPlayer(PlayerAbalone):
         # en moyenne on a ~ 50 actions possibles par état
         # [print(*x) for x in current_state.get_rep().get_grid()]
         # [print(a, b.__dict__) for a, b in current_state.get_rep().env.items()]
+
         if kwargs:
             pass
         # attribution du joueur se fait par rapport a l'odre de la ligne de commande
@@ -52,12 +53,13 @@ class MyPlayer(PlayerAbalone):
                 my_player_id = player.get_id()
                 break
             place += 1
+
         heuristic_tree, hash_table = self.heuristic(current_state= current_state,my_player_id= my_player_id)
         arbre_scorer = heuristic_tree.get_tree() # on obtient un arbre de la forme HeuristicTree avec le score de chaque état décidé par notre heuristic
         # on appelle minimax
 
-        v,m = heuristic_tree.minimax(game_state_parent= current_state, game_state = current_state, maximizingPlayer= True,heuristic_tree= heuristic_tree,hash_table= hash_table)
-
+        #v,m = heuristic_tree.minimax(game_state_parent= current_state, game_state = current_state, maximizingPlayer= True,heuristic_tree= heuristic_tree,hash_table= hash_table)
+        path = heuristic_tree.minimax()
 
         possible_actions = current_state.get_possible_actions()
         random.seed("seahorse")
@@ -154,7 +156,27 @@ class HeuristicTree(dict): # tout transformer en hash
         return None
 
 
+    def minimax(self, maximizingPlayer = True, game_state_hash = 0000000000, depth = 2):
 
+        if game_state_hash == 0000000000 :
+            path_to_hash = [] # ie on est la racine
+        else :
+            path_to_hash = self.find_path_to_hash(game_state_hash)
+        children = self.get_children(path_to_hash)
+        print(path_to_hash,depth)
+        if depth == 0:
+            return 0
+
+        if maximizingPlayer :
+            value = float('-inf')
+
+            for child in children :
+                tmp= self.minimax(game_state_hash= child,maximizingPlayer= False, depth= depth - 1)
+        else :
+            value = float('-inf')
+            for child in children:
+                tmp = self.minimax(game_state_hash=child, maximizingPlayer= True, depth=depth - 1)
+        return path_to_hash
 
 
 
@@ -166,60 +188,7 @@ class HeuristicTree(dict): # tout transformer en hash
 
 
 
-    def minimax(self, game_state_parent : GameState, game_state: GameState, maximizingPlayer: bool, heuristic_tree: dict, hash_table: dict, depth=2):
-        # renvoie à partir d'un état la meilleure action (m) et sa valeur (v)
-        # le premier appel on aura path = None
-        path = []
-        # Check for terminal conditions
-        if game_state.is_done() or depth == 0: # on atteint les feuilles terminales
-            # probleme je n'arrive pas a obtenir le score de game_state
-            # pourquoi ? pb de type ?
-            hash_table_list = list(hash_table.values())
-            idx = hash_table_list.index(game_state)
-            idx_parent = hash_table_list.index(game_state_parent)
-            idx_key_parent = list(hash_table.keys())[idx_parent]
-            idx_key = list(hash_table.keys())[idx]
 
-            if idx == 0 :
-                print(idx, idx_parent)
-                print(idx_key, '  ',idx_key_parent)
-                print('self_parent', self[idx_key])
-                print('fptg',self.find_path_to_state(game_state_parent))
-                print((heuristic_tree)[idx_parent])
-                print(heuristic_tree.keys())
-                print('-')
-
-            return -1, path  # Assuming you have an evaluate_state function
-
-        if maximizingPlayer:
-            value = float('-inf')
-            best_movement = None
-            for child_hash in self.get_children(path):  # For move in possible moves
-                child_node = hash_table[child_hash]
-                child_value, _ = self.minimax( game_state_parent= game_state,
-                    game_state=child_node, maximizingPlayer=False, hash_table=hash_table, heuristic_tree=heuristic_tree,
-                    depth=depth - 1
-                )
-                if child_value > value:
-                    value = child_value
-                    best_movement = child_hash
-        else:
-            value = float('inf')
-            best_movement = None
-            for child_hash in self.get_children(path):
-                child_node = hash_table[child_hash]
-                child_value, _ = self.minimax( game_state_parent= game_state,
-                    game_state=child_node, maximizingPlayer=True, hash_table=hash_table, heuristic_tree=heuristic_tree,
-                    depth=depth - 1
-                )
-                if child_value < value:
-                    value = child_value
-                    best_movement = child_hash
-        return value, best_movement
-
-    """La fonction minimax doit donc renvoyer le score associé à l'état du jeu actuel.
-     Si c'est un nœud de maximisation, vous renvoyez le score maximal parmi les enfants.
-    Si c'est un nœud de minimisation, vous renvoyez le score minimal."""
 
 
 
