@@ -36,6 +36,7 @@ class MyPlayer(PlayerAbalone):
         Returns:
             Action: Randomly selected feasible action
         """
+
         possible_actions = current_state.get_possible_actions()
         random.seed("seahorse")
         if kwargs:

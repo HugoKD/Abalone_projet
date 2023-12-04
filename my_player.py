@@ -39,10 +39,6 @@ class MyPlayer(PlayerAbalone):
             Action: selected feasible action
         """
         # en moyenne on a ~ 50 actions possibles par état
-
-        # [print(*x) for x in current_state.get_rep().get_grid()]
-        # [print(a, b.__dict__) for a, b in current_state.get_rep().env.items()]
-
         players = [player for player in current_state.players]
         my_player_id = None
         place = 0
@@ -50,24 +46,44 @@ class MyPlayer(PlayerAbalone):
             if player.name.startswith("my_player"):
                 my_player_id = player.get_id()
                 break
-            place += 1
+            place += 1 #if place = 0 : white, else : black
 
-        heuristic_tree, hash_table = self.heuristic(current_state= current_state,my_player_id= my_player_id)
+        grid = [x for x in current_state.get_rep().get_grid()]
+        distance = self.distance_moyenne(grid, place)
+
+
+        heuristic_tree, hash_table = self.heuristic(current_state= current_state,my_player_id= my_player_id, place= place)
 
         # on appelle minimax
 
         v,m_hash = heuristic_tree.minimax()
         next_state = hash_table[m_hash]
         best_action = Action(current_state, next_state)
+
         return best_action
 
 
+    def distance_moyenne(self, board: list[list], piece: int, x_m=4, y_m=4) -> float:
+        distance = 0
+        nbr_piece = 0
+        piece_char = 'W' if piece == 0 else 'B'
 
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] == piece_char:
+                    distance += self.distance_euclidienne(j, x_m, i, y_m)
+                    nbr_piece += 1
 
-    def heuristic(self, current_state : GameState, my_player_id : int):
+        return distance / max(1, nbr_piece)  # Avoid division by zero, assuming nbr_piece is always non-negative
+
+    def distance_euclidienne(self, x_elmt, x_m, y_elmt, y_m):
+        return ((y_m - y_elmt) ** 2 + (x_m - x_elmt) ** 2) ** 0.5
+
+    def heuristic(self, current_state : GameState, my_player_id : int, place : int ):
         #création d une table de hashage hash : state et d un arbre heuristique associant hash : score
         #but premier maximiser le score à deux pas
-        # TODO : but deuxième minimiser la moyenne des distances au centre du plateau des billes
+        #but deuxième minimiser la moyenne des distances au centre du plateau des billes
+        x_m,y_m = 4,4 # coordonnée du centre du board
         hash_table = {}
         heuristicTree = HeuristicTree()
         A1 = list(current_state.get_possible_actions())
@@ -78,9 +94,11 @@ class MyPlayer(PlayerAbalone):
             hash_table[a1_hash] = etat1
             for a2 in A2 :
                 etat2 = a2.get_next_game_state()
+                grid = [x for x in etat2.get_rep().get_grid()]
+                distance = self.distance_moyenne(grid,place)
                 a2_hash = etat2.__hash__()
-                score = etat2.get_scores()[my_player_id]
-                heuristicTree[a1_hash][a2_hash] = score # on store le score et le chemin pour y arriver
+                score = round(etat2.get_scores()[my_player_id] - distance,4)*10000
+                heuristicTree[a1_hash][a2_hash] = int(score) # pb : le score ne peut pas etre au chose qu'un int ...
                 hash_table[a2_hash] = etat2
         return heuristicTree, hash_table
 
@@ -109,7 +127,7 @@ class HeuristicTree(dict): # tout transformer en hash
     def get_tree(self):
         return self
 
-    def get_children(self, path_to_node: list):  # path = [a,b,c,d,e,f....] -> list[hash] or int
+    def get_children(self, path_to_node: list) -> list[int] or int: # return list si noeud non final, int = score sinon
         if path_to_node == []:
             x = list(self.keys())
             return x
@@ -122,7 +140,7 @@ class HeuristicTree(dict): # tout transformer en hash
             return list(x.keys())
         #return list hash or valeur node = function evaluate
 
-    def find_path_to_hash(self, hash : int , path=None):  # trouver path_to_action -> list[hash]
+    def find_path_to_hash(self, hash : int , path=None) -> list[int]:  # trouver path_to_action
         if path is None:
             path = []
 
@@ -154,7 +172,7 @@ class HeuristicTree(dict): # tout transformer en hash
         if maximizingPlayer :
             value = float('-inf')
             for child in children : # child is hash
-                tmp= self.minimax(game_state_hash= child,maximizingPlayer= False, depth= depth - 1)[0]
+                tmp= float(self.minimax(game_state_hash= child,maximizingPlayer= False, depth= depth - 1)[0])
                 if type(tmp) == list:
                     tmp = tmp[0]
                 if tmp > value:
