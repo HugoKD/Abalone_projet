@@ -47,12 +47,13 @@ class MyPlayer(PlayerAbalone):
                 my_player_id = player.get_id()
                 break
             place += 1 #if place = 0 : white, else : black
-
+        if place == 1 : place_adverse = 0
+        else : place_adverse = 1
         grid = [x for x in current_state.get_rep().get_grid()]
         distance = self.distance_moyenne(grid, place)
 
 
-        heuristic_tree, hash_table = self.heuristic(current_state= current_state,my_player_id= my_player_id, place= place)
+        heuristic_tree, hash_table = self.heuristic(current_state= current_state,my_player_id= my_player_id, place= place, place_adverse= place_adverse)
 
         # on appelle minimax
 
@@ -79,25 +80,34 @@ class MyPlayer(PlayerAbalone):
     def distance_euclidienne(self, x_elmt, x_m, y_elmt, y_m):
         return ((y_m - y_elmt) ** 2 + (x_m - x_elmt) ** 2) ** 0.5
 
-    def heuristic(self, current_state : GameState, my_player_id : int, place : int ):
+    def heuristic(self, current_state : GameState, my_player_id : int, place : int, place_adverse : int, W_score =.9, W_distance = .5):
         #création d une table de hashage hash : state et d un arbre heuristique associant hash : score
         #but premier maximiser le score à deux pas
         #but deuxième minimiser la moyenne des distances au centre du plateau des billes
+        #Fonction du score attribué aux déplacements favorisant l’éjection de billes, on veut que le score de l'adv soit plus faible qu'au début
         x_m,y_m = 4,4 # coordonnée du centre du board
         hash_table = {}
         heuristicTree = HeuristicTree()
         A1 = list(current_state.get_possible_actions())
+        score0 = list(current_state.scores.values())[place_adverse]
         for a1 in A1:
             etat1 = a1.get_next_game_state()
             a1_hash = etat1.__hash__() # On génère le hash des états
             A2 = list(etat1.generate_possible_actions()) # action possible à partir de état1
+            score1 = list(etat1.scores.values())[place_adverse]
+            epsilon = 0
+            if score1 < score0:
+                epsilon +=100000
             hash_table[a1_hash] = etat1
             for a2 in A2 :
                 etat2 = a2.get_next_game_state()
                 grid = [x for x in etat2.get_rep().get_grid()]
                 distance = self.distance_moyenne(grid,place)
+                score2 = list(etat2.scores.values())[place_adverse]
+                if score2 < score1:
+                    epsilon +=50000
                 a2_hash = etat2.__hash__()
-                score = round(etat2.get_scores()[my_player_id] - distance,4)*10000
+                score = round(W_score * etat2.get_scores()[my_player_id] - W_distance *distance - 100000*epsilon,4)*10000
                 heuristicTree[a1_hash][a2_hash] = int(score) # pb : le score ne peut pas etre au chose qu'un int ...
                 hash_table[a2_hash] = etat2
         return heuristicTree, hash_table
