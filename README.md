@@ -12,4 +12,6 @@ Ces mouvements doivent cependant respecter quelques règles :
 
 La fin de partie est déclarée lorsque six billes d’une même équipe sont expulsées hors du plateau ou lorsque les 2 joueurs ont effectué 50 tours en tout (25 coups chacun). Le gagnant est décidé en comptant le nombre de billes perdues par chaque joueur. La majorité l’emporte. En cas d’égalité, c’est l’équipe ayant la plus petite somme des distances entre ses billes et le centre du plateau qui gagne. Dans le cas improbable ou il y a encore une égalité, alors il y a une égalité entre les deux agents.
 
-<code><img src="GUI/Rapport annuel professionnel entreprise simple.png"></code>
+<p align="center" >
+<code><img src="GUI/Rapport annuel professionnel entreprise simple.png" style= ''></code>
+</p>
