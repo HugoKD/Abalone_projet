@@ -6,9 +6,9 @@ chaque joueur doit effectuer un et un seul déplacement dans n’importe quelle 
 maximum 3) dans le même sens.
 
 Ces mouvements doivent cependant respecter quelques règles :
-• On doit toujours déplacer des billes adjacentes.
-• Si l’on déplace plusieurs billes, cela doit uniquement se faire dans l’une des deux directions parallèles à la ligne formée par ces dernières. Les mouvements en flèche ne sont donc pas autorisés dans le cadre du projet!
-• On peut pousser les billes adverses seulement si l’on est en supériorité numérique stricte et qu’il y a un espace vide (ou le bord du plateau) derrière la ligne formée par ces dernières.
+• On doit toujours déplacer des billes adjacentes. <br>
+• Si l’on déplace plusieurs billes, cela doit uniquement se faire dans l’une des deux directions parallèles à la ligne formée par ces dernières. Les mouvements en flèche ne sont donc pas autorisés dans le cadre du projet!<br>
+• On peut pousser les billes adverses seulement si l’on est en supériorité numérique stricte et qu’il y a un espace vide (ou le bord du plateau) derrière la ligne formée par ces dernières.<br>
 
 La fin de partie est déclarée lorsque six billes d’une même équipe sont expulsées hors du plateau ou lorsque les 2 joueurs ont effectué 50 tours en tout (25 coups chacun). Le gagnant est décidé en comptant le nombre de billes perdues par chaque joueur. La majorité l’emporte. En cas d’égalité, c’est l’équipe ayant la plus petite somme des distances entre ses billes et le centre du plateau qui gagne. Dans le cas improbable ou il y a encore une égalité, alors il y a une égalité entre les deux agents.
 
