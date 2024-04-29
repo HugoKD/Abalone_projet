@@ -14,4 +14,4 @@ La fin de partie est déclarée lorsque six billes d’une même équipe sont ex
 
 ![Texte alternatif](GUI/'Rapport annuel professionnel entreprise simple.png')
 
-[abalone_game](https://github.com/HugoKD/Abalone_projet/blob/master/GUI/Rapport%20annuel%20professionnel%20entreprise%20simple.png)
+[abalone_game]([https://github.com/HugoKD/Abalone_projet/blob/master/GUI/Rapport%20annuel%20professionnel%20entreprise%20simple.png](https://raw.githubusercontent.com/HugoKD/Abalone_projet/master/GUI/Rapport%20annuel%20professionnel%20entreprise%20simple.png))
