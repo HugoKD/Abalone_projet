@@ -1,6 +1,6 @@
 # Abalone_projet
 
-Créer un agent intelligent capable de jouer au jeu Abalone. Abalone est un jeu de stratégie au tour par tour, en un contre un, dont le principe est simple : expulser un maximum de billes de l’adversaire hors
+Créer un environnement de jeu utilisable avec l'utilisation du module SeaHorse, ainsi qu'un agent intelligent capable de jouer au jeu Abalone. Abalone est un jeu de stratégie au tour par tour, en un contre un, dont le principe est simple : expulser un maximum de billes de l’adversaire hors
 du plateau. Ce plateau sur lequel le jeu se déroule est percé de 61 cercles supportant les billes. Chaque joueur possède 14 billes disposées d’une manière bien définie au départ. Le joueur blanc commence. À chaque tour,
 chaque joueur doit effectuer un et un seul déplacement dans n’importe quelle direction (horizontale, verticale, diagonale) sur une case adjacente. Ce mouvement revient à déplacer une ou plusieurs de ses billes (au
 maximum 3) dans le même sens.
@@ -18,3 +18,8 @@ La fin de partie est déclarée lorsque six billes d’une même équipe sont ex
 <p align="center" >
 <code><img src="GUI/Rapport annuel professionnel entreprise simple.png" style= ''></code>
 </p>
+
+
+<br><br>
+
+Choix d'une heuristique simple de min-max avec alpha/beta prunning
