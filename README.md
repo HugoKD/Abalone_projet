@@ -5,7 +5,7 @@ du plateau. Ce plateau sur lequel le jeu se déroule est percé de 61 cercles su
 chaque joueur doit effectuer un et un seul déplacement dans n’importe quelle direction (horizontale, verticale, diagonale) sur une case adjacente. Ce mouvement revient à déplacer une ou plusieurs de ses billes (au
 maximum 3) dans le même sens.
 
-Ces mouvements doivent cependant respecter quelques règles :
+Ces mouvements doivent cependant respecter quelques règles : <br>
 • On doit toujours déplacer des billes adjacentes. <br>
 • Si l’on déplace plusieurs billes, cela doit uniquement se faire dans l’une des deux directions parallèles à la ligne formée par ces dernières. Les mouvements en flèche ne sont donc pas autorisés dans le cadre du projet!<br>
 • On peut pousser les billes adverses seulement si l’on est en supériorité numérique stricte et qu’il y a un espace vide (ou le bord du plateau) derrière la ligne formée par ces dernières.<br>
